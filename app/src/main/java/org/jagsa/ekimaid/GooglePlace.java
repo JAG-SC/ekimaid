@@ -4,11 +4,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * Created by Arata Furukawa on 2016/10/25.
+ * Created by ornew on 2016/10/26.
  */
 
-public class Ekispert {
+public class GooglePlace {
     static URL createRequestURL(String endpoint, String options) throws MalformedURLException {
-        return new URL("http://api.ekispert.jp" + endpoint + "?key=" + APIKEY.ekispert + options);
+        return new URL("https://maps.googleapis.com/maps/api/place" + endpoint
+                + "?key=" + APIKEY.google_place + options);
     }
 }

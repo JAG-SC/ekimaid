@@ -18,5 +18,25 @@
         android:ems="10"
         android:hint="@string/hint_departure"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"/>
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:text="駅周辺のメイド喫茶検索"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/button_search"
+        android:layout_marginTop="28dp"
+        android:layout_below="@+id/input_departure"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="結果が出力されます"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/button_search"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="37dp"
+        android:id="@+id/results"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true" />
 </RelativeLayout>
