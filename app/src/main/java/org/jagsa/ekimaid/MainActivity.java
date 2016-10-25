@@ -97,9 +97,9 @@ public class MainActivity extends AppCompatActivity {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                            button_search.setEnabled(true);
-                            input_departure.setEnabled(true);
                         }
+                        button_search.setEnabled(true);
+                        input_departure.setEnabled(true);
                     }
                 }.execute(input_departure.getText().toString());
             }
