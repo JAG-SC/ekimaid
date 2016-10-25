@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">駅めいど！</string>
+    <string name="hint_departure">出発地</string>
+</resources>
