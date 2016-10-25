@@ -1,14 +1,19 @@
 package org.jagsa.ekimaid;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -61,11 +66,10 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 button_search.setEnabled(false);
                 input_departure.setEnabled(false);
-                new AsyncTask<String, Void, String>(){
+                new AsyncTask<String, Void, JSONArray>(){
                     @Override
-                    protected String doInBackground(String... strings) {
+                    protected JSONArray doInBackground(String... strings) {
                         try {
-                            StringBuilder builder = new StringBuilder();
                             JSONObject station = API.request(
                                     Ekispert.createRequestURL("/v1/json/station", "&name=" + strings[0]));
                             JSONObject results = station.getJSONObject("ResultSet");
@@ -77,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
                                 geo = results.getJSONObject("Point").getJSONObject("GeoPoint");
                             }
                             String geo_point = geo.getString("lati_d") + "," + geo.getString("longi_d");
-                            builder.append(geo_point + '\n');
                             Log.d("EkiMaid", geo_point);
 
                             JSONObject maid = API.request(
@@ -87,12 +90,7 @@ public class MainActivity extends AppCompatActivity {
 
                             Log.d("EkiMaid", "" + maid.toString());
 
-                            JSONArray list = maid.getJSONArray("results");
-                            for(int i = 0; i < list.length(); ++i){
-                                String name = list.getJSONObject(i).getString("name");
-                                builder.append(name + '\n');
-                            }
-                            return builder.toString();
+                            return maid.getJSONArray("results");
                         } catch (IOException e) {
                             e.printStackTrace();
                         } catch (JSONException e) {
@@ -101,10 +99,40 @@ public class MainActivity extends AppCompatActivity {
                         return null;
                     }
                     @Override
-                    protected void onPostExecute(String results) {
+                    protected void onPostExecute(JSONArray results) {
                         super.onPostExecute(results);
-                        TextView text = (TextView) findViewById(R.id.results);
-                        text.setText(results);
+
+                        try {
+                            LinearLayout cardHolder = (LinearLayout) findViewById(R.id.cardHolder);
+                            cardHolder.removeAllViews();
+                            for (int i = 0; i < results.length(); ++i) {
+                                JSONObject data =results.getJSONObject(i);
+                                String name = data.getString("name");
+
+                                LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+                                LinearLayout linearLayout = (LinearLayout) inflater.inflate(R.layout.card, null);
+                                CardView card = (CardView) linearLayout.findViewById(R.id.card);
+                                TextView text = (TextView) linearLayout.findViewById(R.id.cardName);
+                                ImageView img = (ImageView) linearLayout.findViewById(R.id.cardImage);
+                                text.setText(name);
+                                card.setTag(i);
+                                card.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        //Toast.makeText(MainActivity.this, String.valueOf(v.getTag()) + "番目のCardViewがクリックされました", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                JSONObject photo = data.getJSONArray("photos").getJSONObject(0);
+                                new GooglePlace.ImageViewLoader(img).execute(
+                                        photo.getString("photo_reference"),
+                                        photo.getString("width"));
+                                cardHolder.addView(linearLayout);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        //TextView text = (TextView) findViewById(R.id.results);
+                        //text.setText(results);
                         button_search.setEnabled(true);
                         input_departure.setEnabled(true);
                     }

@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">駅めいど！</string>
-    <string name="hint_departure">出発地</string>
+    <string name="hint_departure">駅名入力</string>
+    <string name="button_search">駅周辺のメイド喫茶検索</string>
 </resources>
