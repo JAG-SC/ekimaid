@@ -1,12 +1,9 @@
 package org.jagsa.ekimaid;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -20,31 +17,32 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-
 public class MainActivity extends AppCompatActivity {
     private AutoCompleteTextView input_departure;
     private Button button_search;
+
     class OnFocusChange implements View.OnFocusChangeListener {
-        void hideIME(View view){
-            InputMethodManager imm = (InputMethodManager)getApplicationContext()
-                    .getSystemService(Context.INPUT_METHOD_SERVICE);	//IM取得
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);	//IMを隠す
+        void hideIME(View view) {
+            InputMethodManager imm = (InputMethodManager) getApplicationContext()
+                    .getSystemService(Context.INPUT_METHOD_SERVICE);    //IM取得
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);    //IMを隠す
         }
-        private void offFocus(AutoCompleteTextView view, boolean has){
-            if(!has){ // Focus out
+
+        private void offFocus(AutoCompleteTextView view, boolean has) {
+            if (!has) { // Focus out
                 hideIME(view);
             } else {
-                if(view.getText().length() != 0) {
+                if (view.getText().length() != 0) {
                     view.showDropDown();
                 }
             }
         }
+
         @Override
         public void onFocusChange(View view, boolean has) {
-            switch (view.getId()){
+            switch (view.getId()) {
                 case R.id.input_departure:
-                    offFocus((AutoCompleteTextView)findViewById(view.getId()), has);
+                    offFocus((AutoCompleteTextView) findViewById(view.getId()), has);
                     break;
             }
         }
@@ -55,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        input_departure = (AutoCompleteTextView)findViewById(R.id.input_departure);
+        input_departure = (AutoCompleteTextView) findViewById(R.id.input_departure);
         input_departure.setOnFocusChangeListener(new OnFocusChange());
         input_departure.addTextChangedListener(
                 new SuggestionTextWatcher(this, input_departure));
@@ -66,47 +64,15 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 button_search.setEnabled(false);
                 input_departure.setEnabled(false);
-                new AsyncTask<String, Void, JSONArray>(){
-                    @Override
-                    protected JSONArray doInBackground(String... strings) {
-                        try {
-                            JSONObject station = API.request(
-                                    Ekispert.createRequestURL("/v1/json/station", "&name=" + strings[0]));
-                            JSONObject results = station.getJSONObject("ResultSet");
-                            JSONArray points = results.optJSONArray("Point");
-                            JSONObject geo;
-                            if(points != null){
-                                geo = points.getJSONObject(0).getJSONObject("GeoPoint");
-                            } else {
-                                geo = results.getJSONObject("Point").getJSONObject("GeoPoint");
-                            }
-                            String geo_point = geo.getString("lati_d") + "," + geo.getString("longi_d");
-                            Log.d("EkiMaid", geo_point);
-
-                            JSONObject maid = API.request(
-                                    GooglePlace.createRequestURL("/nearbysearch/json",
-                                            "&keyword=橙幻郷+or+メイド喫茶&location=" + geo_point
-                                                    + "&radius=1000&rankby=prominence"));
-
-                            Log.d("EkiMaid", "" + maid.toString());
-
-                            return maid.getJSONArray("results");
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        return null;
-                    }
+                new MaidCafeSearch() {
                     @Override
                     protected void onPostExecute(JSONArray results) {
                         super.onPostExecute(results);
-
                         try {
                             LinearLayout cardHolder = (LinearLayout) findViewById(R.id.cardHolder);
                             cardHolder.removeAllViews();
                             for (int i = 0; i < results.length(); ++i) {
-                                JSONObject data =results.getJSONObject(i);
+                                JSONObject data = results.getJSONObject(i);
                                 String name = data.getString("name");
 
                                 LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -119,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
                                 card.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        //Toast.makeText(MainActivity.this, String.valueOf(v.getTag()) + "番目のCardViewがクリックされました", Toast.LENGTH_SHORT).show();
                                     }
                                 });
                                 JSONObject photo = data.getJSONArray("photos").getJSONObject(0);
@@ -131,8 +96,6 @@ public class MainActivity extends AppCompatActivity {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        //TextView text = (TextView) findViewById(R.id.results);
-                        //text.setText(results);
                         button_search.setEnabled(true);
                         input_departure.setEnabled(true);
                     }
