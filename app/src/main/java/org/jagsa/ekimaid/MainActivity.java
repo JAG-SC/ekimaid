@@ -64,40 +64,42 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 button_search.setEnabled(false);
                 input_departure.setEnabled(false);
-                new MaidCafeSearch() {
+                new SearchMaidCafeFromStationName() {
                     @Override
                     protected void onPostExecute(JSONArray results) {
                         super.onPostExecute(results);
-                        try {
-                            LinearLayout cardHolder = (LinearLayout) findViewById(R.id.cardHolder);
-                            cardHolder.removeAllViews();
-                            for (int i = 0; i < results.length(); ++i) {
-                                JSONObject data = results.getJSONObject(i);
-                                String name = data.getString("name");
+                        if (results != null) {
+                            try {
+                                LinearLayout cardHolder = (LinearLayout) findViewById(R.id.cardHolder);
+                                cardHolder.removeAllViews();
+                                for (int i = 0; i < results.length(); ++i) {
+                                    JSONObject data = results.getJSONObject(i);
+                                    String name = data.getString("name");
 
-                                LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-                                LinearLayout linearLayout = (LinearLayout) inflater.inflate(R.layout.card, null);
-                                CardView card = (CardView) linearLayout.findViewById(R.id.card);
-                                TextView text = (TextView) linearLayout.findViewById(R.id.cardName);
-                                ImageView img = (ImageView) linearLayout.findViewById(R.id.cardImage);
-                                text.setText(name);
-                                card.setTag(i);
-                                card.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                    }
-                                });
-                                JSONObject photo = data.getJSONArray("photos").getJSONObject(0);
-                                new GooglePlace.ImageViewLoader(img).execute(
-                                        photo.getString("photo_reference"),
-                                        photo.getString("width"));
-                                cardHolder.addView(linearLayout);
+                                    LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+                                    LinearLayout linearLayout = (LinearLayout) inflater.inflate(R.layout.card, null);
+                                    CardView card = (CardView) linearLayout.findViewById(R.id.card);
+                                    TextView text = (TextView) linearLayout.findViewById(R.id.cardName);
+                                    ImageView img = (ImageView) linearLayout.findViewById(R.id.cardImage);
+                                    text.setText(name);
+                                    card.setTag(i);
+                                    card.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                        }
+                                    });
+                                    JSONObject photo = data.getJSONArray("photos").getJSONObject(0);
+                                    new GooglePlace.ImageViewLoader(img).execute(
+                                            photo.getString("photo_reference"),
+                                            photo.getString("width"));
+                                    cardHolder.addView(linearLayout);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                            button_search.setEnabled(true);
+                            input_departure.setEnabled(true);
                         }
-                        button_search.setEnabled(true);
-                        input_departure.setEnabled(true);
                     }
                 }.execute(input_departure.getText().toString());
             }

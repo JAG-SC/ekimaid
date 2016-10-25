@@ -12,7 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * Created by ornew on 2016/10/26.
+ * Created by Arata Furukawa on 2016/10/26.
  */
 
 public class GooglePlace {

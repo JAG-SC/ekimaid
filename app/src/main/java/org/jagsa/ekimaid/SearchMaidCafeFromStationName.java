@@ -12,7 +12,7 @@ import java.io.IOException;
  * Created by Arata Furukawa on 2016/10/26.
  */
 
-public class MaidCafeSearch extends AsyncTask<String, Void, JSONArray> {
+public class SearchMaidCafeFromStationName extends AsyncTask<String, Void, JSONArray> {
     @Override
     protected JSONArray doInBackground(String... strings) {
         try {
