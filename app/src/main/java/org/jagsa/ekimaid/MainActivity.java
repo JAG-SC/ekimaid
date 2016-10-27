@@ -31,10 +31,6 @@ public class MainActivity extends AppCompatActivity {
         private void offFocus(AutoCompleteTextView view, boolean has) {
             if (!has) { // Focus out
                 hideIME(view);
-            } else {
-                if (view.getText().length() != 0) {
-                    view.showDropDown();
-                }
             }
         }
 
