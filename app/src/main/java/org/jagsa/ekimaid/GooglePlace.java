@@ -1,11 +1,8 @@
 package org.jagsa.ekimaid;
 
 import android.graphics.Bitmap;
-import android.media.Image;
 import android.os.AsyncTask;
 import android.widget.ImageView;
-
-import org.json.JSONException;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -30,8 +27,6 @@ public class GooglePlace {
                         GooglePlace.createRequestURL("/photo", "&maxwidth=" + params[1]
                                 + "&photoreference=" + params[0]));
             } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
                 e.printStackTrace();
             }
             return null;

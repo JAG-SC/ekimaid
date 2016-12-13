@@ -24,8 +24,8 @@ public class MainActivity extends AppCompatActivity {
     class OnFocusChange implements View.OnFocusChangeListener {
         void hideIME(View view) {
             InputMethodManager imm = (InputMethodManager) getApplicationContext()
-                    .getSystemService(Context.INPUT_METHOD_SERVICE);    //IM取得
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);    //IMを隠す
+                    .getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
 
         private void offFocus(AutoCompleteTextView view, boolean has) {

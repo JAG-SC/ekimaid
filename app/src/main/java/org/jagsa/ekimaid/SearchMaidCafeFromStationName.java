@@ -16,8 +16,8 @@ public class SearchMaidCafeFromStationName extends AsyncTask<String, Void, JSONA
     @Override
     protected JSONArray doInBackground(String... strings) {
         try {
-            JSONObject station = API.request(
-                    Ekispert.createRequestURL("/v1/json/station", "&name=" + strings[0]));
+            JSONObject station = new JSONObject(
+                    API.request(Ekispert.createRequestURL("/v1/json/station", "&name=" + strings[0])));
             JSONObject results = station.getJSONObject("ResultSet");
             JSONArray points = results.optJSONArray("Point");
             JSONObject geo;
@@ -27,19 +27,18 @@ public class SearchMaidCafeFromStationName extends AsyncTask<String, Void, JSONA
                 geo = results.getJSONObject("Point").getJSONObject("GeoPoint");
             }
             String geo_point = geo.getString("lati_d") + "," + geo.getString("longi_d");
-            Log.d("EkiMaid", geo_point);
+            //Log.d("EkiMaid", geo_point);
 
-            JSONObject maid = API.request(
-                    GooglePlace.createRequestURL("/nearbysearch/json",
-                            "&keyword=橙幻郷+or+メイド喫茶&location=" + geo_point
-                                    + "&radius=1000&rankby=prominence"));
-
-            Log.d("EkiMaid", "" + maid.toString());
-
+            JSONObject maid = new JSONObject(
+                    API.request(GooglePlace.createRequestURL(
+                            "/nearbysearch/json",
+                            "&keyword=橙幻郷+or+メイド喫茶" +
+                            "&location=" + geo_point +
+                            "&radius=1000" +
+                            "&rankby=prominence")));
+            //Log.d("EkiMaid", "" + maid.toString());
             return maid.getJSONArray("results");
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
+        } catch (IOException | JSONException e) {
             e.printStackTrace();
         }
         return null;

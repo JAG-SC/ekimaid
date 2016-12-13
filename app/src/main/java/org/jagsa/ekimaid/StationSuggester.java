@@ -6,7 +6,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 
 /**
@@ -17,8 +16,8 @@ public class StationSuggester extends AsyncTask<String, Void, String[]> {
     @Override
     protected String[] doInBackground(String... str) {
         try {
-            JSONObject json = API.request(
-                    Ekispert.createRequestURL("/v1/json/station/light", "&name=" + str[0]));
+            JSONObject json = new JSONObject(API.request(
+                    Ekispert.createRequestURL("/v1/json/station/light", "&name=" + str[0])));
 
             JSONArray points = json.getJSONObject("ResultSet").getJSONArray("Point");
             if(points.length() <= 0){
@@ -29,11 +28,7 @@ public class StationSuggester extends AsyncTask<String, Void, String[]> {
                 suggests[i] = points.getJSONObject(i).getJSONObject("Station").getString("Name");
             }
             return suggests;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
+        } catch (MalformedURLException | JSONException e) {
             e.printStackTrace();
         }
         return null;

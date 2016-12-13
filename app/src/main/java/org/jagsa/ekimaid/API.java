@@ -3,9 +3,6 @@ package org.jagsa.ekimaid;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,28 +15,52 @@ import java.net.URL;
  */
 
 public class API {
-    static JSONObject request(URL url) throws IOException, JSONException {
-        HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.setInstanceFollowRedirects(false);
-        connection.setDoInput(true);
-        connection.setDoOutput(true);
-        connection.connect();
+    static String request(URL url) {
+        BufferedReader reader = null;
+        StringBuilder response = new StringBuilder();
+        try {
+            HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setInstanceFollowRedirects(false);
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+            connection.connect();
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-        StringBuilder builder = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            //Log.d("EkiMaid", line);
-            builder.append(line + "\n");
+            reader = new BufferedReader(new InputStreamReader(url.openStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                //Log.d("EkiMaid", line);
+                response.append(line + "\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-        reader.close();
-        return new JSONObject(builder.toString());
+        return response.toString();
     }
-    static Bitmap loadBitmap(URL url) throws IOException, JSONException {
-        InputStream in = url.openStream();
-        Bitmap out = BitmapFactory.decodeStream(in);
-        in.close();
-        return out;
+    static Bitmap loadBitmap(URL url) {
+        InputStream in = null;
+        try {
+            in = url.openStream();
+            Bitmap out = BitmapFactory.decodeStream(in);
+            return out;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                in.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 }
